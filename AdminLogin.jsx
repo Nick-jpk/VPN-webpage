@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../firebase';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const auth = getAuth();
+  const ADMIN_EMAIL = "nickheavens52@gmail.com"; // only this email
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      if (user.email !== ADMIN_EMAIL) {
+        alert("Unauthorized: Only the admin can access this page");
+        return;
+      }
+
       navigate('/admin/dashboard');
     } catch (error) {
       alert(error.message);
